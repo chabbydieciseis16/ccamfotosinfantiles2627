@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Galería de Fotografía Escolar - CCAM</title>
+  <title>Control de Fotografías Escolares - Colegio Carlos A. Madrazo</title>
   <style>
     :root {
       --header-bg: #0f172a;       /* Azul Marino Oscuro */
@@ -13,6 +13,7 @@
       --text-dark: #1e293b;
       --text-muted: #64748b;
       --border: #cbd5e1;
+      --whatsapp-green: #25d366;
     }
 
     * {
@@ -42,12 +43,19 @@
       font-size: 2.2rem;
       font-weight: 700;
       letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .school-name {
+      color: var(--yellow-accent);
+      font-size: 1.2rem;
+      font-weight: 600;
       margin-bottom: 6px;
     }
 
     p.subtitle {
       color: #94a3b8;
-      font-size: 1rem;
+      font-size: 0.95rem;
       margin-bottom: 20px;
     }
 
@@ -106,8 +114,8 @@
       background-color: #ffffff;
       color: var(--header-bg);
       border: 2px solid #94a3b8;
-      padding: 14px 22px;
-      font-size: 1rem;
+      padding: 14px 20px;
+      font-size: 0.95rem;
       font-weight: 700;
       border-radius: 10px;
       cursor: pointer;
@@ -115,7 +123,7 @@
       transition: all 0.2s ease;
       flex: 1 1 auto;
       min-width: 160px;
-      max-width: 260px;
+      max-width: 250px;
       text-align: center;
     }
 
@@ -131,6 +139,17 @@
       border-color: var(--yellow-accent);
       box-shadow: 0 4px 12px rgba(15, 23, 42, 0.3);
       transform: translateY(-2px);
+    }
+
+    .tab-btn.warning-tab {
+      border-color: #ef4444;
+      color: #dc2626;
+    }
+
+    .tab-btn.warning-tab.active {
+      background-color: #dc2626;
+      color: #ffffff;
+      border-color: #b91c1c;
     }
 
     /* Galería */
@@ -152,7 +171,7 @@
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
       gap: 20px;
     }
 
@@ -161,7 +180,7 @@
       background: var(--card-bg);
       border-radius: 12px;
       border: 1px solid var(--border);
-      padding: 12px;
+      padding: 14px 12px;
       text-align: center;
       box-shadow: 0 4px 8px rgba(0,0,0,0.06);
       transition: transform 0.2s, box-shadow 0.2s;
@@ -181,7 +200,7 @@
       background-color: #f1f5f9;
       border-radius: 8px;
       overflow: hidden;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       border: 1px solid #cbd5e1;
       display: flex;
       align-items: center;
@@ -196,7 +215,8 @@
 
     .no-photo {
       font-size: 0.8rem;
-      color: var(--text-muted);
+      color: #ef4444;
+      font-weight: 600;
       padding: 10px;
     }
 
@@ -204,23 +224,55 @@
       font-weight: 700;
       font-size: 0.9rem;
       color: var(--text-dark);
-      line-height: 1.3;
-      margin-bottom: 8px;
-      min-height: 2.6em;
+      line-height: 1.25;
+      margin-bottom: 6px;
+      min-height: 2.5em;
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    .photo-code {
-      font-size: 0.8rem;
-      font-weight: 600;
-      font-family: monospace;
-      background: #f1f5f9;
-      color: #334155;
+    .badge-info {
+      font-size: 0.75rem;
+      color: #475569;
+      background-color: #f1f5f9;
       padding: 3px 8px;
       border-radius: 6px;
-      border: 1px solid #cbd5e1;
+      margin-bottom: 4px;
+      width: 100%;
+      word-break: break-all;
+    }
+
+    .type-tag {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: #0369a1;
+      background-color: #e0f2fe;
+      padding: 2px 8px;
+      border-radius: 12px;
+      margin-bottom: 10px;
+    }
+
+    /* Botón WhatsApp */
+    .btn-wa {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      width: 100%;
+      padding: 8px 10px;
+      background-color: var(--whatsapp-green);
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 700;
+      border-radius: 6px;
+      transition: background-color 0.2s, transform 0.1s;
+    }
+
+    .btn-wa:hover {
+      background-color: #1eb956;
+      transform: scale(1.02);
     }
 
     .empty-msg {
@@ -236,10 +288,11 @@
 
   <!-- Encabezado Azul Marino -->
   <header>
-    <h1>GALERÍA DE FOTOGRAFÍA ESCOLAR</h1>
-    <p class="subtitle">Colegio Latino - Control de Fotografías por Grupo</p>
+    <h1>CONTROL DE FOTOGRAFÍAS ESCOLARES</h1>
+    <div class="school-name">Colegio Carlos A. Madrazo (CCAM)</div>
+    <p class="subtitle">Ciclo Escolar - Organización por Grupos y Credenciales</p>
     <div class="controls">
-      <input type="text" id="searchInput" class="search-box" placeholder="🔍 Buscar por alumno o código (ej. 5415)...">
+      <input type="text" id="searchInput" class="search-box" placeholder="🔍 Buscar por alumno, código o tipo...">
     </div>
   </header>
 
@@ -259,6 +312,29 @@
     const API_URL = "https://script.google.com/macros/s/AKfycby8KsuJ5Ce4_rDdS6vb812rycEbsu7Oh8z60mTq_462Be4cVV2FzPaC_Xpk35_ppLbF/exec";
     let allData = [];
 
+    // Orden Estricto de los Niveles / Grupos
+    const GROUP_ORDER = [
+      "Preescolar 1.er Grado A",
+      "Preescolar 2.º Grado A",
+      "Preescolar 3.er Grado A",
+      "Primaria 1.er Grado A",
+      "Primaria 2.º Grado A",
+      "Primaria 3.er Grado A",
+      "Primaria 3.er Grado B",
+      "Primaria 4.º Grado A",
+      "Primaria 4.º Grado B",
+      "Primaria 5.º Grado A",
+      "Primaria 6.º Grado A",
+      "Secundaria 1.er Grado A",
+      "Secundaria 2.º Grado A",
+      "Secundaria 3.er Grado A",
+      "Bachiller 1.er Semestre A",
+      "Bachiller 3.er Semestre A",
+      "Preparatoria Quinto Semestre A",
+      "Personal Docente/Admin",
+      "⚠️ Sin Foto (Sin Código)"
+    ];
+
     async function loadData() {
       try {
         const response = await fetch(API_URL);
@@ -272,6 +348,10 @@
     }
 
     function getGroupName(item) {
+      const codeStr = String(item.codigo).trim().toLowerCase();
+      if (!codeStr || codeStr === "sin código") {
+        return "⚠️ Sin Foto (Sin Código)";
+      }
       if (item.nivel === "Personal") return "Personal Docente/Admin";
       let nivel = item.nivel || "";
       let grado = item.grado || "";
@@ -293,22 +373,31 @@
         groups[gName].push(item);
       });
 
-      // Ordenar alumnos alfabéticamente dentro de cada grupo
+      // Ordenar alumnos alfabéticamente
       Object.keys(groups).forEach(gName => {
         groups[gName].sort((a, b) => a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' }));
       });
 
-      const groupNames = Object.keys(groups);
+      // Clasificar grupos según el orden solicitado
+      const sortedGroupNames = Object.keys(groups).sort((a, b) => {
+        let idxA = GROUP_ORDER.indexOf(a);
+        let idxB = GROUP_ORDER.indexOf(b);
+        if (idxA === -1) idxA = 99;
+        if (idxB === -1) idxB = 99;
+        return idxA - idxB;
+      });
 
-      if (groupNames.length === 0) {
+      if (sortedGroupNames.length === 0) {
         sectionsContainer.innerHTML = '<div class="empty-msg">No se encontraron alumnos ni registros.</div>';
         return;
       }
 
-      groupNames.forEach((gName, index) => {
+      sortedGroupNames.forEach((gName, index) => {
+        const isWarning = gName.includes("Sin Foto");
+
         // Botón grande de pestaña
         const btn = document.createElement('button');
-        btn.className = `tab-btn ${index === 0 ? 'active' : ''}`;
+        btn.className = `tab-btn ${index === 0 ? 'active' : ''} ${isWarning ? 'warning-tab' : ''}`;
         btn.textContent = gName;
         btn.onclick = () => switchTab(index);
         tabsContainer.appendChild(btn);
@@ -327,18 +416,36 @@
 
           const codeStr = String(student.codigo).trim();
           const hasCode = codeStr && codeStr.toLowerCase() !== "sin código";
-          const fileName = hasCode ? `IMG_${codeStr}.JPG` : "";
+          const fileName = hasCode ? `IMG_${codeStr}.JPG` : "Sin Foto";
           const imagePath = hasCode ? `fotos/${fileName}` : "";
+          const tipoCredencial = student.tipo || (student.nivel === "Personal" ? "Docente" : "Estudiante");
+          const gradoGrupoText = `${student.nivel || ''} ${student.grado || ''} ${student.grupo || ''}`.trim();
+
+          // Texto para WhatsApp
+          const waMessage = encodeURIComponent(
+            `*Colegio Carlos A. Madrazo (CCAM)*\n` +
+            `📷 *Fotografía Escolar*\n` +
+            `• *Nombre:* ${student.nombre}\n` +
+            `• *Foto:* ${fileName}\n` +
+            `• *Tipo:* Credencial ${tipoCredencial}\n` +
+            `• *Grado/Grupo:* ${gradoGrupoText}`
+          );
+          const waUrl = `https://wa.me/?text=${waMessage}`;
 
           card.innerHTML = `
             <div class="photo-frame">
               ${hasCode 
                 ? `<img src="${imagePath}" alt="${student.nombre}" onerror="this.onerror=null; this.parentNode.innerHTML='<div class=\\'no-photo\\'>Foto no encontrada<br><small>${fileName}</small></div>';">`
-                : `<div class="no-photo">Sin Código</div>`
+                : `<div class="no-photo">⚠️ Sin Foto</div>`
               }
             </div>
             <div class="student-name">${student.nombre}</div>
-            <div class="photo-code">${hasCode ? fileName : 'S/C'}</div>
+            <div class="badge-info"><strong>Foto:</strong> ${fileName}</div>
+            ${isWarning ? `<div class="badge-info"><strong>Grupo:</strong> ${gradoGrupoText}</div>` : ''}
+            <div class="type-tag">Credencial ${tipoCredencial}</div>
+            <a href="${waUrl}" target="_blank" class="btn-wa">
+              📲 Enviar por WA
+            </a>
           `;
           grid.appendChild(card);
         });
@@ -367,7 +474,8 @@
       const filtered = allData.filter(item => {
         const nameMatch = item.nombre.toLowerCase().includes(term);
         const codeMatch = String(item.codigo).toLowerCase().includes(term);
-        return nameMatch || codeMatch;
+        const typeMatch = String(item.tipo).toLowerCase().includes(term);
+        return nameMatch || codeMatch || typeMatch;
       });
 
       renderGallery(filtered);
