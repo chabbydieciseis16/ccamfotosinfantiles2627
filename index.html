@@ -14,7 +14,6 @@
       --text-muted: #64748b;
       --border: #cbd5e1;
       --whatsapp-green: #25d366;
-      --btn-blue: #0284c7;
     }
 
     * {
@@ -60,7 +59,7 @@
       margin-bottom: 20px;
     }
 
-    /* Barra Amarilla de separación */
+    /* Barra Amarilla */
     .yellow-bar {
       height: 6px;
       background-color: var(--yellow-accent);
@@ -102,7 +101,7 @@
       box-shadow: 0 0 8px rgba(250, 204, 21, 0.4);
     }
 
-    /* Pestañas estilo botones grandes */
+    /* Pestañas grandes */
     .tabs-grid {
       display: flex;
       flex-wrap: wrap;
@@ -172,11 +171,10 @@
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
       gap: 20px;
     }
 
-    /* Tarjetas de Fotos */
     .card {
       background: var(--card-bg);
       border-radius: 12px;
@@ -267,7 +265,7 @@
       justify-content: center;
       gap: 6px;
       width: 100%;
-      padding: 8px 10px;
+      padding: 9px 10px;
       color: #ffffff;
       text-decoration: none;
       font-size: 0.8rem;
@@ -278,20 +276,13 @@
       transition: background-color 0.2s, transform 0.1s;
     }
 
-    .btn-copy {
-      background-color: var(--btn-blue);
-    }
-
-    .btn-copy:hover {
-      background-color: #0369a1;
-    }
-
     .btn-wa {
       background-color: var(--whatsapp-green);
     }
 
     .btn-wa:hover {
       background-color: #1eb956;
+      transform: scale(1.02);
     }
 
     .empty-msg {
@@ -372,19 +363,6 @@
       return `${nivel} ${grado} ${grupo}`.trim();
     }
 
-    async function copyImageToClipboard(imagePath) {
-      try {
-        const response = await fetch(imagePath);
-        const blob = await response.blob();
-        await navigator.clipboard.write([
-          new ClipboardItem({ [blob.type]: blob })
-        ]);
-        alert("📷 ¡Foto copiada al portapapeles! Ahora abre WhatsApp y presiona Ctrl + V para pegarla.");
-      } catch (err) {
-        alert("Para adjuntar la imagen, abre WhatsApp y adjunta el archivo desde la carpeta 'fotos/'.");
-      }
-    }
-
     function renderGallery(data) {
       const tabsContainer = document.getElementById('tabsContainer');
       const sectionsContainer = document.getElementById('sectionsContainer');
@@ -439,24 +417,32 @@
           const codeStr = String(student.codigo).trim();
           const hasCode = codeStr && codeStr.toLowerCase() !== "sin código";
           const fileName = hasCode ? `IMG_${codeStr}.JPG` : "Sin Foto";
-          const imagePath = hasCode ? `fotos/${fileName}` : "";
+          
+          // 1. Ruta local en primer lugar
+          const localImagePath = hasCode ? `fotos/${fileName}` : "";
+          
+          // 2. Ruta de ImgBB para respaldo y envío
+          const imgbbUrl = student.urlFoto || "";
+          
           const tipoCredencial = student.tipo || (student.nivel === "Personal" ? "Docente" : "Estudiante");
           const gradoGrupoText = `${student.nivel || ''} ${student.grado || ''} ${student.grupo || ''}`.trim();
 
+          // El mensaje de WhatsApp utiliza explícitamente el enlace de ImgBB
           const waMessage = encodeURIComponent(
             `*Colegio Carlos A. Madrazo (CCAM)*\n` +
             `📷 *Fotografía Escolar*\n` +
             `• *Nombre:* ${student.nombre}\n` +
-            `• *Archivo:* ${fileName}\n` +
             `• *Tipo:* Credencial ${tipoCredencial}\n` +
-            `• *Grado/Grupo:* ${gradoGrupoText}`
+            `• *Grado/Grupo:* ${gradoGrupoText}\n` +
+            `• *Archivo:* ${fileName}\n\n` +
+            (imgbbUrl ? `🖼️ *Ver Fotografía:* ${imgbbUrl}` : '')
           );
-          const waUrl = `https://wa.me/?text=${waMessage}`;
+          const waUrl = `https://api.whatsapp.com/send?text=${waMessage}`;
 
           card.innerHTML = `
             <div class="photo-frame">
               ${hasCode 
-                ? `<img src="${imagePath}" alt="${student.nombre}" onerror="this.onerror=null; this.parentNode.innerHTML='<div class=\\'no-photo\\'>Foto no encontrada<br><small>${fileName}</small></div>';">`
+                ? `<img src="${localImagePath}" alt="${student.nombre}" onerror="if(this.src!='${imgbbUrl}' && '${imgbbUrl}'!=''){this.src='${imgbbUrl}';}else{this.onerror=null; this.parentNode.innerHTML='<div class=\\'no-photo\\'>Foto no encontrada<br><small>${fileName}</small></div>';}">`
                 : `<div class="no-photo">⚠️ Sin Foto</div>`
               }
             </div>
@@ -465,8 +451,7 @@
             ${isWarning ? `<div class="badge-info"><strong>Grupo:</strong> ${gradoGrupoText}</div>` : ''}
             <div class="type-tag">Credencial ${tipoCredencial}</div>
             <div class="action-buttons">
-              ${hasCode ? `<button class="btn-action btn-copy" onclick="copyImageToClipboard('${imagePath}')">📋 Copiar Foto</button>` : ''}
-              <a href="${waUrl}" target="_blank" class="btn-action btn-wa">📲 Abrir Chat WA</a>
+              <a href="${waUrl}" target="_blank" class="btn-action btn-wa">📲 Enviar por WhatsApp</a>
             </div>
           `;
           grid.appendChild(card);
