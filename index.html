@@ -14,6 +14,7 @@
       --text-muted: #64748b;
       --border: #cbd5e1;
       --whatsapp-green: #25d366;
+      --btn-blue: #0284c7;
     }
 
     * {
@@ -253,26 +254,44 @@
       margin-bottom: 10px;
     }
 
-    /* Botón WhatsApp */
-    .btn-wa {
+    .action-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      width: 100%;
+    }
+
+    .btn-action {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 6px;
       width: 100%;
       padding: 8px 10px;
-      background-color: var(--whatsapp-green);
       color: #ffffff;
       text-decoration: none;
       font-size: 0.8rem;
       font-weight: 700;
       border-radius: 6px;
+      border: none;
+      cursor: pointer;
       transition: background-color 0.2s, transform 0.1s;
+    }
+
+    .btn-copy {
+      background-color: var(--btn-blue);
+    }
+
+    .btn-copy:hover {
+      background-color: #0369a1;
+    }
+
+    .btn-wa {
+      background-color: var(--whatsapp-green);
     }
 
     .btn-wa:hover {
       background-color: #1eb956;
-      transform: scale(1.02);
     }
 
     .empty-msg {
@@ -286,7 +305,6 @@
 </head>
 <body>
 
-  <!-- Encabezado Azul Marino -->
   <header>
     <h1>CONTROL DE FOTOGRAFÍAS ESCOLARES</h1>
     <div class="school-name">Colegio Carlos A. Madrazo (CCAM)</div>
@@ -296,14 +314,10 @@
     </div>
   </header>
 
-  <!-- Barra Amarilla -->
   <div class="yellow-bar"></div>
 
   <main class="container">
-    <!-- Pestañas en forma de Botones Grandes -->
     <div class="tabs-grid" id="tabsContainer"></div>
-
-    <!-- Área de Galería -->
     <div id="loading">Cargando fotografías desde Google Sheets...</div>
     <div id="sectionsContainer"></div>
   </main>
@@ -312,7 +326,6 @@
     const API_URL = "https://script.google.com/macros/s/AKfycby8KsuJ5Ce4_rDdS6vb812rycEbsu7Oh8z60mTq_462Be4cVV2FzPaC_Xpk35_ppLbF/exec";
     let allData = [];
 
-    // Orden Estricto de los Niveles / Grupos
     const GROUP_ORDER = [
       "Preescolar 1.er Grado A",
       "Preescolar 2.º Grado A",
@@ -359,6 +372,19 @@
       return `${nivel} ${grado} ${grupo}`.trim();
     }
 
+    async function copyImageToClipboard(imagePath) {
+      try {
+        const response = await fetch(imagePath);
+        const blob = await response.blob();
+        await navigator.clipboard.write([
+          new ClipboardItem({ [blob.type]: blob })
+        ]);
+        alert("📷 ¡Foto copiada al portapapeles! Ahora abre WhatsApp y presiona Ctrl + V para pegarla.");
+      } catch (err) {
+        alert("Para adjuntar la imagen, abre WhatsApp y adjunta el archivo desde la carpeta 'fotos/'.");
+      }
+    }
+
     function renderGallery(data) {
       const tabsContainer = document.getElementById('tabsContainer');
       const sectionsContainer = document.getElementById('sectionsContainer');
@@ -373,12 +399,10 @@
         groups[gName].push(item);
       });
 
-      // Ordenar alumnos alfabéticamente
       Object.keys(groups).forEach(gName => {
         groups[gName].sort((a, b) => a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' }));
       });
 
-      // Clasificar grupos según el orden solicitado
       const sortedGroupNames = Object.keys(groups).sort((a, b) => {
         let idxA = GROUP_ORDER.indexOf(a);
         let idxB = GROUP_ORDER.indexOf(b);
@@ -395,14 +419,12 @@
       sortedGroupNames.forEach((gName, index) => {
         const isWarning = gName.includes("Sin Foto");
 
-        // Botón grande de pestaña
         const btn = document.createElement('button');
         btn.className = `tab-btn ${index === 0 ? 'active' : ''} ${isWarning ? 'warning-tab' : ''}`;
         btn.textContent = gName;
         btn.onclick = () => switchTab(index);
         tabsContainer.appendChild(btn);
 
-        // Sección contenedora
         const section = document.createElement('div');
         section.className = `group-section ${index === 0 ? 'active' : ''}`;
         section.id = `section-${index}`;
@@ -421,12 +443,11 @@
           const tipoCredencial = student.tipo || (student.nivel === "Personal" ? "Docente" : "Estudiante");
           const gradoGrupoText = `${student.nivel || ''} ${student.grado || ''} ${student.grupo || ''}`.trim();
 
-          // Texto para WhatsApp
           const waMessage = encodeURIComponent(
             `*Colegio Carlos A. Madrazo (CCAM)*\n` +
             `📷 *Fotografía Escolar*\n` +
             `• *Nombre:* ${student.nombre}\n` +
-            `• *Foto:* ${fileName}\n` +
+            `• *Archivo:* ${fileName}\n` +
             `• *Tipo:* Credencial ${tipoCredencial}\n` +
             `• *Grado/Grupo:* ${gradoGrupoText}`
           );
@@ -443,9 +464,10 @@
             <div class="badge-info"><strong>Foto:</strong> ${fileName}</div>
             ${isWarning ? `<div class="badge-info"><strong>Grupo:</strong> ${gradoGrupoText}</div>` : ''}
             <div class="type-tag">Credencial ${tipoCredencial}</div>
-            <a href="${waUrl}" target="_blank" class="btn-wa">
-              📲 Enviar por WA
-            </a>
+            <div class="action-buttons">
+              ${hasCode ? `<button class="btn-action btn-copy" onclick="copyImageToClipboard('${imagePath}')">📋 Copiar Foto</button>` : ''}
+              <a href="${waUrl}" target="_blank" class="btn-action btn-wa">📲 Abrir Chat WA</a>
+            </div>
           `;
           grid.appendChild(card);
         });
